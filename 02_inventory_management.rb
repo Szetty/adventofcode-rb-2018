@@ -1,3 +1,5 @@
+require 'set'
+
 input = (ARGV.empty? ? DATA : ARGF).each_line.map(&:chomp).map(&:freeze).freeze
 
 two = 0
@@ -11,9 +13,17 @@ input.each { |i|
 
 puts two * three
 
-input.combination(2) { |a, b|
-  match = a.each_char.zip(b.each_char).map { |aa, bb| aa if aa == bb }.compact
-  (puts match.join; break) if match.size == a.size - 1
+seen = Set.new
+
+# O(k^2 * n) (where k is length of the strings) solution,
+# Rather than the obvious O(k * n^2) solution.
+# So pay attention to the relative size of k vs n before choosing this way.
+input.each { |s|
+  s.each_char.with_index { |c, i|
+    pair = [s[0...i], s[(i + 1)..-1]]
+    puts pair.join if seen.include?(pair)
+    seen << pair
+  }
 }
 
 __END__
